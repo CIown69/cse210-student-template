@@ -9,17 +9,28 @@ class Program
         List<int> numbers = new List<int>();
     
         int userNumber = -1;
-        while (userNumber != 0)
+
+        do
         {
             Console.Write("Enter a number (0 to quit): ");
-            
+
             string userResponse = Console.ReadLine();
-            userNumber = int.Parse(userResponse);
-            
+            if (!int.TryParse(userResponse, out userNumber))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid integer.");
+                continue;
+            }
+
             if (userNumber != 0)
             {
                 numbers.Add(userNumber);
             }
+        } while (userNumber != 0);
+
+        if (numbers.Count == 0)
+        {
+            Console.WriteLine("No numbers entered. Exiting.");
+            return;
         }
 
         int sum = 0;
