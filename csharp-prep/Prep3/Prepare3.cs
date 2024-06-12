@@ -21,7 +21,6 @@ class Program
             Console.Write("What is your guess? ");
             string guessInput = Console.ReadLine();
 
-            // Validate the guess input
             if (!int.TryParse(guessInput, out guess))
             {
                 Console.WriteLine("Please enter a valid number.");
