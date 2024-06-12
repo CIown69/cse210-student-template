@@ -12,7 +12,7 @@ class Program
 
         do
         {
-            Console.Write("Enter a number (0 to quit): ");
+            Console.Write("Enter a number (0 to Finish): ");
 
             string userResponse = Console.ReadLine();
             if (!int.TryParse(userResponse, out userNumber))
