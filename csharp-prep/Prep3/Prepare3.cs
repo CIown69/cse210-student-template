@@ -4,17 +4,29 @@ class Program
 {
     static void Main(string[] args)
     {
-        Console.Write("What is the Number? ");
-        string answer = Console.ReadLine();
-        int Number = int.Parse(1, 101);
+        Console.Write("Enter the secret number (between 1 and 100): ");
+        string secretInput = Console.ReadLine();
+        int Number;
 
+        while (!int.TryParse(secretInput, out Number) || Number < 1 || Number > 100)
+        {
+            Console.WriteLine("Please enter a valid number between 1 and 100.");
+            secretInput = Console.ReadLine();
+        }
 
         int guess = -1;
 
         while (guess != Number)
         {
             Console.Write("What is your guess? ");
-            guess = int.Parse(Console.ReadLine());
+            string guessInput = Console.ReadLine();
+
+            // Validate the guess input
+            if (!int.TryParse(guessInput, out guess))
+            {
+                Console.WriteLine("Please enter a valid number.");
+                continue;
+            }
 
             if (Number > guess)
             {
@@ -28,7 +40,6 @@ class Program
             {
                 Console.WriteLine("You guessed it!");
             }
-
-        }                    
+        }
     }
 }
