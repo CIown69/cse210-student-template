@@ -79,9 +79,9 @@ class Journal
     {
         foreach (Entry entry in entries)
         {
-            Console.WriteLine("Date: " + entry.Date);
-            Console.WriteLine("Prompt: " + entry.Prompt);
-            Console.WriteLine("Response: " + entry.Response);
+            Console.WriteLine("Date: " + entry.GetDate());
+            Console.WriteLine("Prompt: " + entry.GetPrompt());
+            Console.WriteLine("Response: " + entry.GetResponse());
             Console.WriteLine();
         }
     }
@@ -122,15 +122,30 @@ class Journal
 
 class Entry
 {
-    public string Prompt { get; }
-    public string Response { get; }
-    public string Date { get; }
+    private string Prompt { get; }
+    private string Response { get; }
+    private string Date { get; }
 
     public Entry(string prompt, string response, string date)
     {
-        Prompt = prompt;
-        Response = response;
-        Date = date;
+        this.Prompt = prompt;
+        this.Response = response;
+        this.Date = date;
+    }
+
+    public string GetPrompt()
+    {
+        return Prompt;
+    }
+
+    public string GetResponse()
+    {
+        return Response;
+    }
+
+    public string GetDate()
+    {
+        return Date;
     }
 
     public string ToFileFormat()
