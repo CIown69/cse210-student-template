@@ -126,15 +126,32 @@ class Program
 {
     static void Main()
     {
-        ScriptureReference ref1 = new ScriptureReference("Proverbs 3:5-6");
-        ScriptureReference ref2 = new ScriptureReference("John 3:16");
-        Console.WriteLine(ref1);
-        Console.WriteLine(ref2);
+        var scriptures = new Dictionary<string, string>
+        {
+            { "Proverbs 3:5-6", "Trust in the LORD with all your heart and lean not on your own understanding" },
+            { "John 3:16", "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life" }
+        };
 
-        string reference = "Proverbs 3:5-6";
-        string text = "Trust in the LORD with all your heart and lean not on your own understanding";
+        Console.WriteLine("Select a scripture to display:");
+        int index = 1;
+        foreach (var reference in scriptures.Keys)
+        {
+            Console.WriteLine($"{index}. {reference}");
+            index++;
+        }
 
-        Scripture scripture = new Scripture(reference, text);
-        scripture.Display();
+        Console.WriteLine("Enter the number of your choice:");
+        if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= scriptures.Count)
+        {
+            var selectedReference = scriptures.Keys.ElementAt(choice - 1);
+            var text = scriptures[selectedReference];
+
+            Scripture scripture = new Scripture(selectedReference, text);
+            scripture.Display();
+        }
+        else
+        {
+            Console.WriteLine("Invalid choice. Exiting.");
+        }
     }
 }
