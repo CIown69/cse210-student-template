@@ -67,23 +67,25 @@ public class Scripture
 
 public class Word
 {
-    public string Text { get; }
-    public bool IsHidden { get; private set; }
+    private readonly string text;
+    private bool isHidden;
+    public string Text => text;
+    public bool IsHidden => isHidden;
 
     public Word(string text)
     {
-        Text = text;
-        IsHidden = false;
+        this.text = text;
+        isHidden = false;
     }
 
     public void Hide()
     {
-        IsHidden = true;
+        isHidden = true;
     }
 
     public override string ToString()
     {
-        return IsHidden ? "______" : Text;
+        return isHidden ? "______" : text;
     }
 }
 
