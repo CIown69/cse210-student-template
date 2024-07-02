@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Buffers;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 public abstract class Activity
 {
@@ -36,7 +37,6 @@ public abstract class Activity
 
     protected void PrepareForActivity()
     {
-        // Can implement some animation or countdown here
         Console.WriteLine("Starting activity in:");
         for (int i = 3; i > 0; i--)
         {
@@ -74,6 +74,93 @@ public class BreathingActivity : Activity
         }
     }
 }
+
+public class QuotesActivity : Activity
+{
+    private string[] quotes = 
+    {
+        "Ralph Waldo Emerson: The purpose of life is not to be happy. It is to be useful, to be honorable, to be compassionate, to have it make some difference that you have lived and lived well.",
+        "Mahatma Gandhi: The best way to find yourself is to lose yourself in the service of others.",
+        "Helen Keller: Life is either a daring adventure or nothing at all.",
+        "Winston Churchill: Success is not final, failure is not fatal: It is the courage to continue that counts.",
+        "Thomas Edison: I have not failed. I've just found 10,000 ways that won't work.",
+        "Albert Einstein: Try not to become a man of success. Rather become a man of value.",
+        "Mother Teresa: Spread love everywhere you go. Let no one ever come to you without leaving happier.",
+        "Leo Buscaglia: Too often we underestimate the power of a touch, a smile, a kind word, a listening ear, an honest compliment, or the smallest act of caring, all of which have the potential to turn a life around.",
+        "Martin Luther King Jr.: Love is the only force capable of transforming an enemy into a friend.",
+        "Confucius: Real knowledge is to know the extent of one's ignorance.",
+        "Socrates: The only true wisdom is in knowing you know nothing.",
+        "Benjamin Franklin: Tell me and I forget, teach me and I may remember, involve me and I learn.",
+        "Nelson Mandela: The greatest glory in living lies not in never falling, but in rising every time we fall.",
+        "Maya Angelou: You may encounter many defeats, but you must not be defeated.",
+        "Vince Lombardi: It's not whether you get knocked down, it's whether you get up.",
+        "Carl Jung: Your vision will become clear only when you can look into your own heart. Who looks outside, dreams; who looks inside, awakes.",
+        "Anaïs Nin: We don’t see things as they are, we see them as we are.",
+        "Lao Tzu: Knowing others is intelligence; knowing yourself is true wisdom. Mastering others is strength; mastering yourself is true power.",
+        "Unkown: Oh how miserable life would be if it all meant nothing."
+    };
+
+    public QuotesActivity() : base("Quotes Activity", "This activity will give you some inspiring quotes.")
+    {
+    }
+    protected override void PerformActivity()
+    {
+        Random rand = new Random();
+        int initialDuration = duration;
+        DateTime startTime = DateTime.Now;
+        int countdown = duration;
+
+        while (countdown > 0)
+        {
+            Console.WriteLine("Press Enter to get a new quote or type 'exit' to stop:");
+            Console.WriteLine($"Time left: {countdown} seconds");
+            CancellationTokenSource cts = new CancellationTokenSource();
+            CancellationToken token = cts.Token;
+
+            Task<string> userInputTask = GetUserInputAsync(token);
+            Task delayTask = Task.Delay(countdown * 1000, token);
+
+            Task completedTask = Task.WhenAny(userInputTask, delayTask).Result;
+
+            if (completedTask == userInputTask)
+            {
+                string userInput = userInputTask.Result;
+
+                if (userInput.ToLower() == "exit")
+                {
+                    Console.WriteLine("Exiting the quotes activity...");
+                    break;
+                }
+
+                int index = rand.Next(quotes.Length);
+                Console.WriteLine(quotes[index]);
+
+                countdown = initialDuration - (int)(DateTime.Now - startTime).TotalSeconds;
+            }
+            else if (completedTask == delayTask)
+            {
+                Console.WriteLine("Time is up. Exiting the activity.");
+                break;
+            }
+        }
+    }
+    private async Task<string> GetUserInputAsync(CancellationToken token)
+    {
+        try
+        {
+            return await Task.Run(() =>
+            {
+                string userInput = Console.ReadLine();
+                token.ThrowIfCancellationRequested();
+                return userInput;
+            }, token);
+        }
+        catch (OperationCanceledException)
+        {
+            return "";
+        }
+    }
+} 
 public class ReflectionActivity : Activity
 {
     private string[] prompts = {
@@ -182,7 +269,6 @@ public class ListingActivity : Activity
         {
             Console.WriteLine("Enter an item (or 'done' to finish):");
 
-            // Read user input asynchronously
             return await Task.Run(() =>
             {
                 string userInput = Console.ReadLine();
@@ -192,7 +278,7 @@ public class ListingActivity : Activity
         }
         catch (OperationCanceledException)
         {
-            return ""; // Return empty string in case of cancellation
+            return "";
         }
     }
 }
@@ -206,7 +292,8 @@ class Program
             Console.WriteLine("1. Breathing Activity");
             Console.WriteLine("2. Reflection Activity");
             Console.WriteLine("3. Listing Activity");
-            Console.WriteLine("4. Exit");
+            Console.WriteLine("4. Quotes");
+            Console.WriteLine("5. Exit");
 
             int choice = int.Parse(Console.ReadLine());
 
@@ -225,6 +312,10 @@ class Program
                     listingActivity.Run();
                     break;
                 case 4:
+                    QuotesActivity quotesActivity = new QuotesActivity();
+                    quotesActivity.Run();
+                    break;
+                case 5:
                     Console.WriteLine("Exiting program...");
                     return;
                 default:
