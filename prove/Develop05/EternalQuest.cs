@@ -92,6 +92,21 @@ class Program
 {
     private static List<Goal> goals = new List<Goal>();
     private static int userScore = 0;
+    private static Random random = new Random();
+     private static List<string> randomQuests = new List<string>
+    {
+        "Walk 10,000 steps",
+        "Read a chapter of the Book of Mormon",
+        "Meditate for 10 minutes",
+        "Do 20 push-ups",
+        "Listen to a General Conference Talk",
+        "Write in a journal for 15 minutes",
+        "Complete a puzzle",
+        "Clean your room",
+        "Cook a new recipe",
+        "Call a friend or family member"
+    };
+    private static List<string> completedRandomQuests = new List<string>();
 
     static void Main(string[] args)
     {
@@ -105,7 +120,8 @@ class Program
             Console.WriteLine("2. Record Event");
             Console.WriteLine("3. Show Goals");
             Console.WriteLine("4. Show Score");
-            Console.WriteLine("5. Save and Exit");
+            Console.WriteLine("5. Random Quest");
+            Console.WriteLine("6. Save and Exit");
             Console.Write("Choose an option: ");
             string choice = Console.ReadLine();
 
@@ -124,6 +140,9 @@ class Program
                     ShowScore();
                     break;
                 case "5":
+                    RandomQuest();
+                    break;
+                case "6":
                     SaveData();
                     return;
                 default:
@@ -227,6 +246,36 @@ class Program
         Console.ReadKey();
     }
 
+    private static void RandomQuest()
+    {
+        Console.Clear();
+        if (randomQuests.Count == 0)
+        {
+            Console.WriteLine("No quest available? Generating new quest");
+        }
+        else
+        {
+            int randomIndex = random.Next(randomQuests.Count);
+            string randomQuest = randomQuests[randomIndex];
+            Console.WriteLine($"Suggested Goal: {randomQuest}");
+            Console.Write("Did you complete this quest? (y/n): ");
+            string completed = Console.ReadLine();
+
+            if (completed.Equals("y", StringComparison.OrdinalIgnoreCase))
+            {
+                userScore += 50;
+                completedRandomQuests.Add(randomQuest);
+                Console.WriteLine("Quest completed! You earned 50 points.");
+            }
+            else
+            {
+                Console.WriteLine("Quest not completed. No points awarded.");
+            }
+        }
+        Console.WriteLine("Press any key to return to the menu...");
+        Console.ReadKey();
+    }
+
     private static void SaveData()
     {
         using (StreamWriter writer = new StreamWriter("data.txt"))
@@ -243,6 +292,11 @@ class Program
                     writer.WriteLine($"{goal.GetType().Name}|{goal.Name}|{goal.Points}|{goal.IsCompleted}");
                 }
             }
+            writer.WriteLine("CompletedRandomQuests:");
+            foreach (string quest in completedRandomQuests)
+            {
+                writer.WriteLine(quest);
+            }
         }
     }
 
@@ -252,9 +306,10 @@ class Program
         {
             string[] lines = File.ReadAllLines("data.txt");
             userScore = int.Parse(lines[0]);
-            for (int i = 1; i < lines.Length; i++)
+            int index = 1;
+            while (index < lines.Length && !lines[index].Equals("CompletedRandomQuests:"))
             {
-                string[] parts = lines[i].Split('|');
+                string[] parts = lines[index].Split('|');
                 string type = parts[0];
                 string name = parts[1];
                 int points = int.Parse(parts[2]);
@@ -274,6 +329,15 @@ class Program
                         int bonusPoints = int.Parse(parts[6]);
                         goals.Add(new ChecklistGoal(name, points, requiredCount, bonusPoints, currentCount, isCompleted));
                         break;
+                }
+                index++;
+            }
+
+            if (index < lines.Length && lines[index].Equals("CompletedRandomQuest:"))
+            {
+                for (int i = index + 1; i < lines.Length; i++)
+                {
+                    completedRandomQuests.Add(lines[i]);
                 }
             }
         }

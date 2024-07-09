@@ -1,3 +1,5 @@
-200
+300
 SimpleGoal|Learn Chinese Phrase|100|True
 EternalGoal|marriage|1000|False
+CompletedRandomQuests:
+Listen to a General Conference Talk
