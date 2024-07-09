@@ -1,0 +1,3 @@
+200
+SimpleGoal|Learn Chinese Phrase|100|True
+EternalGoal|marriage|1000|False
